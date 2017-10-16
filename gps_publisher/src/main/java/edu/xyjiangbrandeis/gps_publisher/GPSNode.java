@@ -15,7 +15,7 @@ import org.ros.node.ConnectedNode;
 import org.ros.node.Node;
 import org.ros.node.topic.Publisher;
 
-public class GPSNode extends AbstractNodeMain implements LocationProvider.LocationCallback{
+public class GPSNode extends AbstractNodeMain {
 
     private Node node;
     private Publisher<std_msgs.Float64MultiArray> publisher;
@@ -33,7 +33,7 @@ public class GPSNode extends AbstractNodeMain implements LocationProvider.Locati
         publisher = connectedNode.newPublisher("gps_publisher", std_msgs.Float64MultiArray._TYPE);
              // This CancellableLoop will be canceled automatically when the node shuts
              // down.
-        mLocationProvider = new LocationProvider(context, this);
+        mLocationProvider = new LocationProvider(context, new PublishingGPSCallback());
         connectedNode.executeCancellableLoop(new CancellableLoop() {
             int count;
 
@@ -68,16 +68,20 @@ public class GPSNode extends AbstractNodeMain implements LocationProvider.Locati
         return GraphName.of("android/gps");
     }
 
-    public void handleNewLocation(Location location) {
-        Log.d("Location", location.toString());
 
-        currentLatitude = location.getLatitude();
-        currentLongitude = location.getLongitude();
 
-        std_msgs.Float64MultiArray msg = publisher.newMessage();
-        double[] data = {currentLatitude, currentLongitude};
-        msg.setData(data);
-        publisher.publish(msg);
+    private final class PublishingGPSCallback implements LocationProvider.LocationCallback {
+        public void handleNewLocation(Location location) {
+            Log.d("Location", location.toString());
 
+            currentLatitude = location.getLatitude();
+            currentLongitude = location.getLongitude();
+
+            std_msgs.Float64MultiArray msg = publisher.newMessage();
+            double[] data = {currentLatitude, currentLongitude};
+            msg.setData(data);
+            publisher.publish(msg);
+
+        }
     }
 }
