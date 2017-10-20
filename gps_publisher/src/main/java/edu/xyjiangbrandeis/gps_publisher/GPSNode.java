@@ -23,8 +23,11 @@ public class GPSNode extends AbstractNodeMain {
     private Context context;
     private double currentLatitude = 0;
     private double currentLongitude = 0;
+    private NodeLocationCallback callback;
 
-    public GPSNode(Context context) {
+    public GPSNode(Context context, NodeLocationCallback callback) {
+
+        this.callback = callback;
         this.context = context;
     }
 
@@ -39,7 +42,6 @@ public class GPSNode extends AbstractNodeMain {
 
             @Override
             protected void setup() {
-                Log.d("FUCK","node setup");
                 count = 0;
                 mLocationProvider.connect();
             }
@@ -71,6 +73,7 @@ public class GPSNode extends AbstractNodeMain {
 
 
     private final class PublishingGPSCallback implements LocationProvider.LocationCallback {
+
         public void handleNewLocation(Location location) {
             Log.d("Location", location.toString());
 
@@ -81,7 +84,11 @@ public class GPSNode extends AbstractNodeMain {
             double[] data = {currentLatitude, currentLongitude};
             msg.setData(data);
             publisher.publish(msg);
-
+            callback.handleNewLocation(location);
         }
+    }
+
+    public abstract interface NodeLocationCallback {
+        public void handleNewLocation(Location location);
     }
 }
