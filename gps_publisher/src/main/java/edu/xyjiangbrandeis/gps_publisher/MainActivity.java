@@ -1,5 +1,10 @@
 package edu.xyjiangbrandeis.gps_publisher;
 
+import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,11 +17,14 @@ import org.ros.android.RosActivity;
 import org.ros.node.NodeConfiguration;
 import org.ros.node.NodeMainExecutor;
 
-public class MainActivity extends RosActivity implements GPSNode.NodeLocationCallback {
+public class MainActivity extends RosActivity implements GPSNode.NodeLocationCallback, SensorEventListener {
 
     private GPSNode node;
     private TextView latitudeView, longitudeView, countView, accuracyView;
     private int count = 0;
+    private float currentDegree = 0f;
+    private SensorManager mSensorManager;
+    TextView tvHeading;
 //    private MapFragment mMapFragment;
 
     public MainActivity() {
@@ -38,6 +46,9 @@ public class MainActivity extends RosActivity implements GPSNode.NodeLocationCal
         countView = (TextView) findViewById(R.id.textView3);
         accuracyView = (TextView) findViewById(R.id.textView4);
 
+        //Sensor and Textview to display
+        tvHeading = (TextView) findViewById(R.id.tvHeading);
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 //        mMapFragment = MapFragment.newInstance();
 //        FragmentTransaction fragmentTransaction =
 //                getFragmentManager().beginTransaction();
@@ -76,6 +87,37 @@ public class MainActivity extends RosActivity implements GPSNode.NodeLocationCal
 //
 //        }
 //    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // for the system's orientation sensor registered listeners
+        mSensorManager.registerListener(this,
+                mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION),
+                SensorManager.SENSOR_DELAY_GAME);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        // to stop the listener and save battery
+        mSensorManager.unregisterListener(this);
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        // get the angle around the z-axis rotated
+        float degree = Math.round(event.values[0]);
+        //Log.d("DEGREES",Float.toString(degree));
+        if (tvHeading != null) {
+            tvHeading.setText("Heading: " + Float.toString(degree) + " degrees");
+        }
+    }
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        // not in use
+    }
 }
 
 
