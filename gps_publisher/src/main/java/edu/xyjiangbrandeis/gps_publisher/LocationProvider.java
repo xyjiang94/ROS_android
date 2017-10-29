@@ -55,8 +55,8 @@ public class LocationProvider implements
         // Create the LocationRequest object
         mLocationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                .setInterval(2 * 1000)        // 10 seconds, in milliseconds
-                .setFastestInterval(1 * 1000); // 1 second, in milliseconds
+                .setInterval(500)        // 10 seconds, in milliseconds
+                .setFastestInterval(500); // 1 second, in milliseconds
 
         mContext = context;
     }
