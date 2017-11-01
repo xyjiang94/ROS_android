@@ -1,5 +1,6 @@
 package edu.xyjiangbrandeis.gps_publisher;
 
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -12,18 +13,26 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
 import org.ros.address.InetAddressFactory;
 import org.ros.android.RosActivity;
 import org.ros.node.NodeConfiguration;
 import org.ros.node.NodeMainExecutor;
 
-public class MainActivity extends RosActivity implements GPSNode.NodeLocationCallback, SensorEventListener {
+public class MainActivity extends RosActivity implements GPSNode.NodeLocationCallback, SensorEventListener, OnMapReadyCallback {
 
     private GPSNode node;
     private TextView latitudeView, longitudeView, countView, accuracyView;
     private int count = 0;
     private float currentDegree = 0f;
     private SensorManager mSensorManager;
+    private GoogleMap mMap;
     TextView tvHeading;
 //    private MapFragment mMapFragment;
 
@@ -49,16 +58,16 @@ public class MainActivity extends RosActivity implements GPSNode.NodeLocationCal
         //Sensor and Textview to display
         tvHeading = (TextView) findViewById(R.id.tvHeading);
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-//        mMapFragment = MapFragment.newInstance();
-//        FragmentTransaction fragmentTransaction =
-//                getFragmentManager().beginTransaction();
-//        fragmentTransaction.add(R.id.scrollView, mMapFragment);
-//        fragmentTransaction.commit();
-//
-//        MapFragment mapFragment = (MapFragment) getFragmentManager()
-//                .findFragmentById(R.id.map);
-//        mapFragment.getMapAsync(new MapReadyCallBack());
 
+        //mapfragment code
+        //((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMapAsync(this);
+        //mapFragment.getMapAsync(this);
+
+        MapFragment mMapFragment = MapFragment.newInstance();
+        FragmentTransaction fragmentTransaction =
+                getFragmentManager().beginTransaction();
+        fragmentTransaction.add(R.id.map, mMapFragment);
+        fragmentTransaction.commit();
     }
 
     @Override
@@ -117,6 +126,11 @@ public class MainActivity extends RosActivity implements GPSNode.NodeLocationCal
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
         // not in use
+    }
+
+    @Override
+    public void onMapReady(GoogleMap map) {
+        map.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
     }
 }
 
