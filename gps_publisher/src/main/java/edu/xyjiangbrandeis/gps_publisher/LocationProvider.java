@@ -83,12 +83,7 @@ public class LocationProvider implements
             Log.d("permission", "failed");
             return;
         } else {
-//            Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-//            if (location == null) {
                 LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-//            } else {
-//                mLocationCallback.handleNewLocation(location);
-//            }
         }
 
     }

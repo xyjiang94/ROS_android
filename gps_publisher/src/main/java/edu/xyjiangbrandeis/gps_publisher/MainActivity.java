@@ -16,7 +16,6 @@ import android.widget.TextView;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -122,7 +121,9 @@ public class MainActivity extends RosActivity implements GPSNode.NodeLocationCal
         if (tvHeading != null) {
             tvHeading.setText("Heading: " + Float.toString(degree) + " degrees");
         }
+        node.headingChangedCallback(event.values[0]);
     }
+
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
         // not in use
